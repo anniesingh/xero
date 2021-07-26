@@ -1,0 +1,37 @@
+# Xero Configuration
+
+xero:
+  base_url: https://login.xero.com/identity/connect/authorize
+  params:
+    response_type: code
+    redirect_uri: https://developer.xero.com
+    state: 1234
+    scope:
+      - offline_access
+      - accounting.transactions
+      - openid
+      - profile
+      - email
+      - accounting.contacts
+      - accounting.settings
+      - accounting.reports.read
+  selectors:
+    user_name: 'input[type="email"]'
+    password: 'input[type="password"]'
+    login: 'button[value="login"]'
+    approve: 'button#approveButton:enabled'
+  headless: True
+  token:
+    token_url: https://identity.xero.com/connect/token
+    content_type: application/x-www-form-urlencoded
+    init_grant_type: authorization_code
+    refresh_grant_type: refresh_token
+  
+
+
+enable_logging: False
+
+
+# Balance Sheet
+
+# Big Query

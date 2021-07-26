@@ -1,0 +1,15 @@
+appdirs==1.4.4
+asyncio==3.4.3
+autopep8==1.5.7
+certifi==2021.5.30
+charset-normalizer==2.0.3
+idna==3.2
+pycodestyle==2.7.0
+pyee==8.1.0
+pyppeteer @ git+https://github.com/pyppeteer/pyppeteer@0fd15a7c4b2d3aeaaf6da65da9033c150de0d3cb
+PyYAML==5.4.1
+requests==2.26.0
+toml==0.10.2
+tqdm==4.61.2
+urllib3==1.26.6
+websockets==9.1
