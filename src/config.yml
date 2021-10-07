@@ -1,5 +1,4 @@
 # Xero Configuration
-
 xero:
   base_url: https://login.xero.com/identity/connect/authorize
   params:
@@ -20,18 +19,28 @@ xero:
     password: 'input[type="password"]'
     login: 'button[value="login"]'
     approve: 'button#approveButton:enabled'
-  headless: True
+  headless: False
   token:
     token_url: https://identity.xero.com/connect/token
     content_type: application/x-www-form-urlencoded
     init_grant_type: authorization_code
     refresh_grant_type: refresh_token
-  
 
+# Google Big Query Configuration
+big_query:
+  project_id: diagonal-311905
+  tenant_table_id: diagonal-311905.xero.tenant
+  tenant_write_deposition: WRITE_TRUNCATE
+  balancesheet_table_id: diagonal-311905.xero.balancesheet
+  balancesheet_write_deposition: WRITE_TRUNCATE
 
+# Xero API Endpoints Configuration
+xero_api:
+  host: https://api.xero.com
+  tenant_endpoint: /connections
+  context_type: application/json
+  balancesheet_endpoint: /api.xro/2.0/Reports/BalanceSheet
+  accept: application/json
+
+# Logging Configuration
 enable_logging: False
-
-
-# Balance Sheet
-
-# Big Query

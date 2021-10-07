@@ -1,13 +1,16 @@
 from os import access
+import json
 import urllib
 import requests
 import asyncio
+import time
 import urllib.parse as urlparse
+from datetime import datetime
 from pyppeteer import launch
 from utils.helperutils import HelperUtils
 
 
-class XeroAuthHelper:
+class AuthHelper:
     def __init__(self):
         utils = HelperUtils()
         self.xero_config = utils.get_xero_config()
@@ -19,6 +22,8 @@ class XeroAuthHelper:
         self.refresh_token = None
         self.expired_in = None
         self.token_type = None
+        self.error = None
+        self.token_generated_at = None
 
     def get_base_url(self):
         return self.xero_config["base_url"]
@@ -44,6 +49,12 @@ class XeroAuthHelper:
 
     def get_token_config(self):
         return self.xero_config["token"]
+
+    def is_token_expired(self):
+        if int((datetime.now()-self.token_generated_at).total_seconds()) < (self.expired_in-300):
+            return True
+        else:
+            return False
 
     async def get_xero_auth_context(self):
         browser = await launch(headless=self.get_headless_config())
@@ -99,10 +110,11 @@ class XeroAuthHelper:
             "redirect_uri": params['redirect_uri']
         }
 
-        rq = requests.post(
+        response = requests.post(
             token_config["token_url"], headers=headers, data=body)
+        response_body = response.json()
 
-        return rq.json()
+        return response_body
 
     async def get_access_token_by_refresh_token(self, refresh_token):
         token_config = self.get_token_config()
@@ -115,18 +127,35 @@ class XeroAuthHelper:
             "refresh_token": refresh_token
         }
 
-        rq = requests.post(
+        response = requests.post(
             token_config["token_url"], headers=headers, data=body)
+        response_body = response.json()
 
-        return rq.json()
+        if "error" in response_body and response_body["error"] == "invalid_grant":
+                response_body = await self.get_access_token_by_auth_code()
+
+        return response_body
 
     async def get_access_token(self):
-        pass
+        response_body = None
 
+        if self.access_token == None:
+            response_body = await self.get_access_token_by_auth_code()
+            
+        if self.refresh_token != None and self.is_token_expired() == True:
+            response_body = await self.get_access_token_by_refresh_token(self.refresh_token)
+            
+        self.token_generated_at = datetime.now()
+        self.access_token = response_body["access_token"]
+        self.refresh_token = response_body["refresh_token"]
+        self.expired_in = response_body["expires_in"]
+        self.token_type = response_body["token_type"]
+            
+        return f"{self.token_type} {self.access_token}"
+        
+# async def acccess_token():
+#     xero_helper = AuthHelper()
+#     access_token = await xero_helper.get_access_token()
+#     print(access_token)
 
-async def main():
-    xero_helper = XeroAuthHelper()
-    access_token = await xero_helper.get_access_token()
-
-
-asyncio.get_event_loop().run_until_complete(main())
+# asyncio.get_event_loop().run_until_complete(acccess_token())
